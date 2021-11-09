@@ -10,7 +10,7 @@ The token is added to the request as Bearer Authentication.
 
 ## References
 
-This project is loosely based on https://github.com/be-humble/kong-ext-auth
+This project is losely based on https://github.com/be-humble/kong-ext-auth
 
 ## Setup plugin
 
@@ -122,7 +122,7 @@ Follow documentation
 
 First time we must follow first link to prepare the env.
 
-NOTE: I found an issue working with Docker modules in windows. If you get this error: XXXXX remove these lines from pongo file YYYYYYY
+> NOTE: I found an issue working with Docker modules in windows. You might need to remove some lines from pongo file.
 
 Next time we work with pongo we only need to execute:
 ```
