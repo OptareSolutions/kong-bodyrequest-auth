@@ -17,7 +17,7 @@ source = {
 }
 
 description = {
-  summary = "A Kong plugin for performing authentication to and endpoint by extracting the credentials (user & pass) from the original request body, authenticating with them in an login API and injecting the received token in the Bearer header",
+  summary = "A Kong plugin for performing authentication to and endpoint by authenticating in an login API that requires username and password in a JSON body and injecting the received token in the Bearer header",
   homepage = "https://github.com/"..github_account_name.."/"..github_repo_name,
   license = "Apache 2.0",
 }
