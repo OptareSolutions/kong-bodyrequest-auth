@@ -3,30 +3,27 @@ local package_name = "kong-plugin-" .. plugin_name
 local package_version = "1.0.0"
 local rockspec_revision = "1"
 
-local github_account_name = "Kong"
-local github_repo_name = "kong-plugin"
-local git_checkout = package_version == "dev" and "master" or package_version
-
+local github_account_name = "OptareSolutions"
+local github_repo_name = "kong-bodyrequest-auth"
+local github_tag = "main"
 
 package = package_name
 version = package_version .. "-" .. rockspec_revision
 supported_platforms = { "linux", "macosx" }
 source = {
-  url = "git://github.com/"..github_account_name.."/"..github_repo_name..".git",
-  branch = git_checkout,
+    url = "git://github.com/"..github_account_name.."/"..github_repo_name,
+    tag = github_tag,
+    dir = github_repo_name
 }
 
-
 description = {
-  summary = "Kong is a scalable and customizable API Management Layer built on top of Nginx.",
-  homepage = "https://"..github_account_name..".github.io/"..github_repo_name,
+  summary = "A Kong plugin for performing authentication to and endpoint by extracting the credentials (user & pass) from the original request body, authenticating with them in an login API and injecting the received token in the Bearer header",
+  homepage = "https://github.com/"..github_account_name.."/"..github_repo_name,
   license = "Apache 2.0",
 }
 
-
 dependencies = {
 }
-
 
 build = {
   type = "builtin",
