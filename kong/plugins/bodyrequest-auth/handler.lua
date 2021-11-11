@@ -4,6 +4,18 @@ local cjson = require "cjson"
 local kong = kong
 local ExternalAuthHandler = BasePlugin:extend()
 
+local priority_env_var = "BODYREQUEST_AUTH_PRIORITY"
+local priority
+if os.getenv(priority_env_var) then
+    priority = tonumber(os.getenv(priority_env_var))
+else
+    priority = 900
+end
+kong.log.debug('BODYREQUEST_AUTH_PRIORITY: ' .. priority)
+
+ExternalAuthHandler.PRIORITY = priority
+ExternalAuthHandler.VERSION = "1.1.0"
+
 function ExternalAuthHandler:new()
   ExternalAuthHandler.super.new(self, "bodyrequest-auth")
 end
@@ -59,8 +71,5 @@ function ExternalAuthHandler:access(conf)
 
   kong.service.request.set_header(conf.header_request, "Bearer " .. token[conf.json_token_key])
 end
-
-ExternalAuthHandler.PRIORITY = 900
-ExternalAuthHandler.VERSION = "1.0.0"
 
 return ExternalAuthHandler
