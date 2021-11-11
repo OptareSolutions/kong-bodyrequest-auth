@@ -112,6 +112,12 @@ luarocks pack kong-plugin-bodyrequest-auth 1.0.0
 # Set propper version
 ```
 
+## Priority
+By default, the priority of the plugin is 900. You can change it using an environment variable:
+```
+BODYREQUEST_AUTH_PRIORITY=1000
+```
+
 ## Test local
 
 ### Start pongo
