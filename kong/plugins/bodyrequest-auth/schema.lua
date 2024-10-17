@@ -82,12 +82,6 @@ return {
             }
           },
           {
-            log_enabled = {
-              default = false,
-              type = "boolean"
-            }
-          },
-          {
             refresh_url = typedefs.url({
               required = false
             })

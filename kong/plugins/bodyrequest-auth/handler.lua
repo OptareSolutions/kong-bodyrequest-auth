@@ -2,10 +2,10 @@ local http = require "resty.http"
 local cjson = require "cjson"
 local kong = kong
 local BodyRequestAuthHandler = {
-  VERSION = "1.2.0"
+  VERSION = "1.3.0"
 }
 
-local CACHE_TOKEN_KEY = "oauth_token"
+local CACHE_TOKEN_KEY = "body_request_plugin_token"
 
 local priority_env_var = "BODYREQUEST_AUTH_PRIORITY"
 local priority
@@ -24,19 +24,15 @@ function BodyRequestAuthHandler:access(conf)
 
   -- Get token with cache
   if conf.cache_enabled then
-    if conf.log_enabled then
-      kong.log.info("Cache enabled")
-    end
+    kong.log.info("Cache enabled")
     tokenInfo = get_cache_token(conf)
     if not tokenInfo then
-      if conf.log_enabled then
-        kong.log.info("No token in cache. Call OAuth provider to update it")
-      end
-      tokenInfo = kong.cache:get(CACHE_TOKEN_KEY, nil, get_oauth_token, conf)
+      kong.log.info("No token in cache. Call token provider to update it")
+      tokenInfo = kong.cache:get(CACHE_TOKEN_KEY, nil, get_token, conf)
     end
   -- Get token without cache
   else
-    tokenInfo = get_oauth_token(conf)
+    tokenInfo = get_token(conf)
   end
 
   -- Final validation and set header
@@ -44,10 +40,9 @@ function BodyRequestAuthHandler:access(conf)
     return kong.response.exit(401, {message="Invalid authentication credentials"})
   end
 
-  if conf.log_enabled then
-    kong.log.info("Login success.")
-    kong.log.debug("Token: " .. cjson.encode(tokenInfo))
-  end
+
+  kong.log.info("Login success.")
+  kong.log.debug("Token: " .. cjson.encode(tokenInfo))
 
   kong.service.request.set_header(conf.header_request, "Bearer " .. tokenInfo.token)
 end
@@ -66,25 +61,20 @@ function get_cache_token(conf)
     return nil
   end
 
-  local timeToRefeshToken = token.expiration + conf.expiration_margin
+  local timeToRefreshToken = token.expiration + conf.expiration_margin
 
-  if token.expiration and (token.expiration < os.time()) and (timeToRefeshToken > os.time())
+  if (token.expiration < os.time()) and (timeToRefreshToken > os.time())
   and conf.refresh_url and conf.refresh_path then
-      if conf.log_enabled then
-        kong.log.debug("Get new token using refresh token ", token.expiration)
-      end
+      kong.log.debug("Get new token using refresh token ", token.expiration)
       local refreshToken = token.refreshToken
       kong.cache:invalidate(CACHE_TOKEN_KEY)
 
-      token = kong.cache:get(CACHE_TOKEN_KEY, nil, get_refresh_oauth_token, conf, refreshToken)
-      kong.log.debug("New expiration time is ", token.expiration)
+      token = kong.cache:get(CACHE_TOKEN_KEY, nil, get_refresh_token, conf, refreshToken)
   end
 
-  if token.expiration and (token.expiration < os.time()) then
+  if (token.expiration < os.time()) then
     -- Token is expired invalidate it
-    if conf.log_enabled then
-      kong.log.debug("Invalidate expired token: " .. cjson.encode(token))
-    end
+    kong.log.debug("Invalidate expired token: " .. cjson.encode(token))
     kong.cache:invalidate(CACHE_TOKEN_KEY)
     return nil
   end
@@ -92,8 +82,8 @@ function get_cache_token(conf)
   return token
 end
 
--- Get token from OAuth provider
-function get_oauth_token(conf)
+-- Get token from provider
+function get_token(conf)
   local res, err = perform_login(conf)
 
   local error_message = validate_login(res, err, conf)
@@ -109,12 +99,10 @@ function perform_login(conf)
   local client = http.new()
   client:set_timeouts(conf.connect_timeout, conf.send_timeout, conf.read_timeout)
 
-  if conf.log_enabled then
-    kong.log.warn("Login via body request")
-    kong.log.warn("Url:    ", conf.url)
-    kong.log.warn("Path:   ", conf.path)
-    kong.log.warn("Method: ", conf.method)
-  end
+  kong.log.debug("Login via body request")
+  kong.log.debug("Url:    ", conf.url)
+  kong.log.debug("Path:   ", conf.path)
+  kong.log.debug("Method: ", conf.method)
 
   return client:request_uri(
     conf.url,
@@ -132,16 +120,12 @@ end
 -- Validate login response
 function validate_login(res, err, conf)
   if not res then
-    if conf.log_enabled then
-      kong.log.err("No response. Error: ", err)
-    end
-    return "No response from OAuth provider"
+    kong.log.err("No response. Error: ", err)
+    return "No response from token provider"
   end
 
   if res.status ~= 200 then
-    if conf.log_enabled then
-      kong.log.err("Got error status ", res.status, res.body)
-    end
+    kong.log.err("Got error status ", res.status, res.body)
     return "Invalid authentication credentials"
   end
 end
@@ -169,10 +153,8 @@ function get_token_from_response(res, conf)
       refreshTokenValue = ""
   end
 
-  if conf.log_enabled then
-    kong.log.debug("Current time: ", os.time())
-    kong.log.debug("Expiration time: ", expirationValue)
-  end
+  kong.log.debug("Current time: ", os.time())
+  kong.log.debug("Expiration time: ", expirationValue)
 
   return {
     token = responseBody[conf.json_token_key],
@@ -182,8 +164,8 @@ function get_token_from_response(res, conf)
   };
 end
 
--- Get new token using refresh token from OAuth provider
-function get_refresh_oauth_token(conf, refreshToken)
+-- Get new token using refresh token from provider
+function get_refresh_token(conf, refreshToken)
   local res, err = perform_login_with_refresh_token(conf, refreshToken)
 
   local error_message = validate_login(res, err, conf)
@@ -199,12 +181,10 @@ function perform_login_with_refresh_token(conf, refreshToken)
   local client = http.new()
   client:set_timeouts(conf.connect_timeout, conf.send_timeout, conf.read_timeout)
 
-  if conf.log_enabled then
-    kong.log.warn("Login via body request with refresh token")
-    kong.log.warn("Url:    ", conf.refresh_url)
-    kong.log.warn("Path:   ", conf.refresh_path)
-    kong.log.warn("Method: ", conf.refresh_method)
-  end
+  kong.log.debug("Login via body request with refresh token")
+  kong.log.debug("Url:    ", conf.refresh_url)
+  kong.log.debug("Path:   ", conf.refresh_path)
+  kong.log.debug("Method: ", conf.refresh_method)
 
   return client:request_uri(
     conf.refresh_url,
