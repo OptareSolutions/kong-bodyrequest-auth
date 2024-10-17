@@ -27,7 +27,7 @@ function BodyRequestAuthHandler:access(conf)
     kong.log.info("Cache enabled")
     tokenInfo = get_cache_token(conf)
     if not tokenInfo then
-      kong.log.info("No token in cache. Call token provider to update it")
+      kong.log.debug("No token in cache. Call token provider to update it")
       tokenInfo = kong.cache:get(CACHE_TOKEN_KEY, nil, get_token, conf)
     end
   -- Get token without cache
