@@ -129,13 +129,13 @@ return {
             }
           },
           {
-            manual_time_out = {
+            manual_timeout = {
               default = 0,
               type = "number"
             }
           },
             {
-            time_out_test = {
+            timeout_test = {
               default = 0,
               type = "number"
             }

@@ -2,7 +2,7 @@ local http = require "resty.http"
 local cjson = require "cjson"
 local kong = kong
 local BodyRequestAuthHandler = {
-  VERSION = "1.3.0"
+  VERSION = "2.0.0"
 }
 
 local CACHE_TOKEN_KEY = "body_request_plugin_token"
@@ -138,11 +138,11 @@ function get_token_from_response(res, conf)
   local ttlValue = nil
   local refreshTokenValue = nil
   if responseBody[conf.json_expires_in_key] then
-    expirationValue = os.time() + responseBody[conf.json_expires_in_key] - conf.expiration_margin - conf.time_out_test
+    expirationValue = os.time() + responseBody[conf.json_expires_in_key] - conf.expiration_margin - conf.timeout_test
     ttlValue = responseBody[conf.json_expires_in_key]
-  elseif conf.manual_time_out and conf.manual_time_out > 0 then
-      expirationValue = os.time() + conf.manual_time_out
-      ttlValue = conf.manual_time_out
+  elseif conf.manual_timeout and conf.manual_timeout > 0 then
+      expirationValue = os.time() + conf.manual_timeout
+      ttlValue = conf.manual_timeout
   else
     ttlValue = 0
   end
