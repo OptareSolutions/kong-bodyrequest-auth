@@ -82,9 +82,62 @@ return {
             }
           },
           {
-            log_enabled = {
+            refresh_url = typedefs.url({
+              required = false
+            })
+          },
+          {
+            refresh_path = {
+              required = false,
+              type = "string"
+            }
+          },
+          {
+            refresh_method = {
+              default = "GET",
+              type = "string"
+            }
+          },
+          {
+            json_refresh_token_response_key = {
+              default = "refreshToken",
+              type = "string"
+            }
+          },
+          {
+            json_refresh_token_request_key = {
+              default = "token",
+              type = "string"
+            }
+          },
+          {
+            json_expires_in_key = {
+              default = "expiresIn",
+              type = "string"
+            }
+          },
+          {
+            cache_enabled = {
               default = false,
               type = "boolean"
+            }
+          },
+          {
+            expiration_margin = {
+              default = 5,
+              type = "number"
+            }
+          },
+          {
+            manual_timeout = {
+              default = 0,
+              type = "number"
+            }
+          },
+            {
+            timeout_test = {
+              default = 0,
+              type = "number"
             }
           }
         }
