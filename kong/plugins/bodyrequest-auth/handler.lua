@@ -25,14 +25,14 @@ function BodyRequestAuthHandler:access(conf)
   -- Get token with cache
   if conf.cache_enabled then
     kong.log.info("Cache enabled")
-    tokenInfo = get_cache_token(conf)
+    tokenInfo = body_request_auth_get_cache_token(conf)
     if not tokenInfo then
       kong.log.debug("No token in cache. Call token provider to update it")
-      tokenInfo = kong.cache:get(CACHE_TOKEN_KEY, nil, get_token, conf)
+      tokenInfo = kong.cache:get(CACHE_TOKEN_KEY, nil, body_request_auth_get_token, conf)
     end
   -- Get token without cache
   else
-    tokenInfo = get_token(conf)
+    tokenInfo = body_request_auth_get_token(conf)
   end
 
   -- Final validation and set header
@@ -53,7 +53,7 @@ end
 -------------
 
 -- Get token from cache
-function get_cache_token(conf)
+function body_request_auth_get_cache_token(conf)
   local token = kong.cache:get(CACHE_TOKEN_KEY)
   -- If value in cache is nil we must invalidate it
   if not token or not token.expiration then
@@ -69,7 +69,7 @@ function get_cache_token(conf)
       local refreshToken = token.refreshToken
       kong.cache:invalidate(CACHE_TOKEN_KEY)
 
-      token = kong.cache:get(CACHE_TOKEN_KEY, nil, get_refresh_token, conf, refreshToken)
+      token = kong.cache:get(CACHE_TOKEN_KEY, nil, body_request_auth_get_refresh_token, conf, refreshToken)
   end
 
   if (token.expiration < os.time()) then
@@ -83,19 +83,19 @@ function get_cache_token(conf)
 end
 
 -- Get token from provider
-function get_token(conf)
-  local res, err = perform_login(conf)
+function body_request_auth_get_token(conf)
+  local res, err = body_request_auth_perform_login(conf)
 
-  local error_message = validate_login(res, err, conf)
+  local error_message = body_request_auth_validate_login(res, err, conf)
   if error_message then
     return nil;
   end
 
-  return get_token_from_response(res, conf)
+  return body_request_auth_get_token_from_response(res, conf)
 end
 
 -- Login
-function perform_login(conf)
+function body_request_auth_perform_login(conf)
   local client = http.new()
   client:set_timeouts(conf.connect_timeout, conf.send_timeout, conf.read_timeout)
 
@@ -118,7 +118,7 @@ function perform_login(conf)
 end
 
 -- Validate login response
-function validate_login(res, err, conf)
+function body_request_auth_validate_login(res, err, conf)
   if not res then
     kong.log.err("No response. Error: ", err)
     return "No response from token provider"
@@ -131,7 +131,7 @@ function validate_login(res, err, conf)
 end
 
 -- Extract token
-function get_token_from_response(res, conf)
+function body_request_auth_get_token_from_response(res, conf)
   local responseBody = cjson.decode(res.body)
 
   local expirationValue = nil
@@ -165,19 +165,19 @@ function get_token_from_response(res, conf)
 end
 
 -- Get new token using refresh token from provider
-function get_refresh_token(conf, refreshToken)
-  local res, err = perform_login_with_refresh_token(conf, refreshToken)
+function body_request_auth_get_refresh_token(conf, refreshToken)
+  local res, err = body_request_auth_perform_login_with_refresh_token(conf, refreshToken)
 
-  local error_message = validate_login(res, err, conf)
+  local error_message = body_request_auth_validate_login(res, err, conf)
   if error_message then
     return nil;
   end
 
-  return get_token_from_response(res, conf)
+  return body_request_auth_get_token_from_response(res, conf)
 end
 
 -- Login
-function perform_login_with_refresh_token(conf, refreshToken)
+function body_request_auth_perform_login_with_refresh_token(conf, refreshToken)
   local client = http.new()
   client:set_timeouts(conf.connect_timeout, conf.send_timeout, conf.read_timeout)
 
