@@ -22,7 +22,7 @@ function BodyRequestAuthHandler:access(conf)
 
   local tokenInfo = nil
 
-  if conf.cache_key then
+  if conf.cache_key and CACHE_TOKEN_KEY == "body_request_plugin_token" then
     CACHE_TOKEN_KEY = CACHE_TOKEN_KEY .. conf.cache_key
   end
 
