@@ -24,6 +24,7 @@ function BodyRequestAuthHandler:access(conf)
 
   if conf.cache_key then
     CACHE_TOKEN_KEY = CACHE_TOKEN_KEY .. conf.cache_key
+  end
 
   -- Get token with cache
   if conf.cache_enabled then
