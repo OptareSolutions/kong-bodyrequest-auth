@@ -22,7 +22,7 @@ function BodyRequestAuthHandler:access(conf)
 
   local tokenInfo = nil
 
-  if conf.cache_key
+  if conf.cache_key then
     CACHE_TOKEN_KEY = CACHE_TOKEN_KEY .. conf.cache_key
 
   -- Get token with cache
