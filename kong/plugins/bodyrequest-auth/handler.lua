@@ -22,6 +22,9 @@ function BodyRequestAuthHandler:access(conf)
 
   local tokenInfo = nil
 
+  if conf.cache_key
+    CACHE_TOKEN_KEY = CACHE_TOKEN_KEY .. conf.cache_key
+
   -- Get token with cache
   if conf.cache_enabled then
     kong.log.info("Cache enabled")

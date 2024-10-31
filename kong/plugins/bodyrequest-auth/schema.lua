@@ -123,6 +123,12 @@ return {
             }
           },
           {
+            cache_key = {
+              required = false,
+              type = "string"
+            }
+          },
+          {
             expiration_margin = {
               default = 5,
               type = "number"
