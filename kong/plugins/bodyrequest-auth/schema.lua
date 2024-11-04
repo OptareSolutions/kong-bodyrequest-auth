@@ -124,7 +124,7 @@ return {
           },
           {
             cache_key = {
-              required = false,
+              default = "body_request_plugin_token",
               type = "string"
             }
           },
