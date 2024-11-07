@@ -123,12 +123,6 @@ return {
             }
           },
           {
-            cache_key = {
-              default = "body_request_plugin_token",
-              type = "string"
-            }
-          },
-          {
             expiration_margin = {
               default = 5,
               type = "number"

@@ -14,12 +14,40 @@ This project is losely based on https://github.com/be-humble/kong-ext-auth
 
 ## Setup plugin
 
+
+
 Check plugin [schema](./kong/plugins/bodyrequest-auth/schema.lua) for detailed info.
 
-Plugin logs are at warn level but disabled by default. If you want the plugin to show logs add the config property:
+Plugin logs depend on kong log level. If you want the plugin to show logs set KONG_LOG_LEVEL vat to debug:
 ```
-log_enabled: true
+- name: KONG_LOG_LEVEL
+  value: debug
 ```
+
+| Parameter | mandatory | default            | description                                                                                                                                                                                                                                                                                            |
+| ---  |-----------|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| url | true      |                    | Host of the auth provider to request the access token.                                                                                                                                                                                                                                                 |
+| path | true      |                    | Path to conform the complete url to request the access token.                                                                                                                                                                                                                                          |
+| method | false     | GET                | Http method to request the access token.                                                                                                                                                                                                                                                               |
+| username_key | false     | username           | Credentials.                                                                                                                                                                                                                                                                                           |
+| username_value | true      |                    | Credentials.                                                                                                                                                                                                                                                                                           |
+| password_key | false     | password           | Credentials.                                                                                                                                                                                                                                                                                           |
+| password_value | true      |                    | Credentials.                                                                                                                                                                                                                                                                                           |
+| json_token_key | false     | token              | Key where the token is in the auth provider response.                                                                                                                                                                                                                                                  |
+| header_request | false     | Authorization      | Header where the token will be sent upstream.                                                                                                                                                                                                                                                          |
+| connect_timeout | false     | 10000              | Auth REST client settings.                                                                                                                                                                                                                                                                             |
+| send_timeout | false     | 60000              | Auth REST client settings.                                                                                                                                                                                                                                                                             |
+| read_timeout | false     | 60000              | Auth REST client settings.                                                                                                                                                                                                                                                                             |
+| refresh_url | false     |                    | Host of the auth provider to request the access a refreshToken. Required if the auth provider send a refreshToken in the response.                                                                                                                                                                     |
+| refresh_path | false     | client_credentials | Path to conform the complete url to request the access token. Required if the auth provider send a refreshToken in the response.                                                                                                                                                                       |
+| refresh_method | false     |                    | Http method to request the access token. Required if the auth provider send a refreshToken in the response.                                                                                                                                                                                            |                                                                                                                   |
+| json_refresh_token_response_key | false     | refreshToken       | Key where the tokens is in the auth provider response.                                                                                                                                                                                                                                                 |
+| json_refresh_token_request_key | false     | token              | Key where the refreshToken is in the auth provider request.                                                                                                                                                                                                                                            |
+| json_expires_in_key | false     | expiresIn          | Key that indicates the token timeout.                                                                                                                                                                                                                                                                  |
+| cache_enabled | false     | false              | Enable cache for tokens. Advanced feature.                                                                                                                                                                                                                                                             |
+| expiration_margin | false     | 5                  | Time before token expiration to request a new token using the refreshToken endpoint.                                                                                                                                                                                                                   |
+| manual_timeout | false     | 0                  | Set a manual timeout for the cached token. Required if the auth provider does not indicate a timeout.                                                                                                                                                                                                  |
+| timeout_test | false     | 0                  | It allows you to adjust the timeout indicated in the response by the auth provider for testing (If in the response the timeout is 3600 we can set this value to 3540 so that this value is subtracted from the value of the response and thus leave a timeout of 60s, which makes testing easier).     |
 
 ### Config using k8s
 
@@ -181,8 +209,7 @@ curl -i -X POST \
     --data 'config.method=POST' \
     --data 'config.json_token_key=my-token-id' \
     --data 'config.username_value=AAAAAA' \
-    --data 'config.password_value=BBBBBB' \
-    --data 'config.log_enabled=true'
+    --data 'config.password_value=BBBBBB'
 
 #check
 curl -i -H "Host: example.com" http://localhost:8000/
