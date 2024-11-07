@@ -5,6 +5,8 @@ local BodyRequestAuthHandler = {
   VERSION = "2.0.0"
 }
 
+local CACHE_TOKEN_KEY = "body_request_plugin_token_"
+
 local priority_env_var = "BODYREQUEST_AUTH_PRIORITY"
 local priority
 if os.getenv(priority_env_var) then
@@ -26,7 +28,7 @@ function BodyRequestAuthHandler:access(conf)
     tokenInfo = body_request_auth_get_cache_token(conf)
     if not tokenInfo then
       kong.log.debug("No token in cache. Call token provider to update it")
-      tokenInfo = kong.cache:get(conf.cache_key, nil, body_request_auth_get_token, conf)
+      tokenInfo = kong.cache:get(CACHE_TOKEN_KEY .. conf.cache_key, nil, body_request_auth_get_token, conf)
     end
   -- Get token without cache
   else
@@ -52,10 +54,10 @@ end
 
 -- Get token from cache
 function body_request_auth_get_cache_token(conf)
-  local token = kong.cache:get(conf.cache_key)
+  local token = kong.cache:get(CACHE_TOKEN_KEY .. conf.cache_key)
   -- If value in cache is nil we must invalidate it
   if not token or not token.expiration then
-    kong.cache:invalidate(conf.cache_key)
+    kong.cache:invalidate(CACHE_TOKEN_KEY .. conf.cache_key)
     return nil
   end
 
@@ -65,15 +67,15 @@ function body_request_auth_get_cache_token(conf)
   and conf.refresh_url and conf.refresh_path then
       kong.log.debug("Get new token using refresh token ", token.expiration)
       local refreshToken = token.refreshToken
-      kong.cache:invalidate(conf.cache_key)
+      kong.cache:invalidate(CACHE_TOKEN_KEY .. conf.cache_key)
 
-      token = kong.cache:get(conf.cache_key, nil, body_request_auth_get_refresh_token, conf, refreshToken)
+      token = kong.cache:get(CACHE_TOKEN_KEY .. conf.cache_key, nil, body_request_auth_get_refresh_token, conf, refreshToken)
   end
 
   if (token.expiration < os.time()) then
     -- Token is expired invalidate it
     kong.log.debug("Invalidate expired token: " .. cjson.encode(token))
-    kong.cache:invalidate(conf.cache_key)
+    kong.cache:invalidate(CACHE_TOKEN_KEY .. conf.cache_key)
     return nil
   end
 
