@@ -2,7 +2,7 @@ local http = require "resty.http"
 local cjson = require "cjson"
 local kong = kong
 local BodyRequestAuthHandler = {
-  VERSION = "2.0.0"
+  VERSION = "2.0.1"
 }
 
 local CACHE_TOKEN_KEY = "body_request_plugin_token"
@@ -104,15 +104,21 @@ function body_request_auth_perform_login(conf)
   kong.log.debug("Path:   ", conf.path)
   kong.log.debug("Method: ", conf.method)
 
+  local payload = {
+    [conf.username_key] = conf.username_value,
+    [conf.password_key] = conf.password_value
+  }
+
+  if conf.paramlogin_key and conf.paramlogin_key ~= "" then
+    payload[conf.paramlogin_key] = conf.paramlogin_value
+  end
+
   return client:request_uri(
     conf.url,
     {
       method = conf.method,
       path = conf.path,
-      body = cjson.encode({
-        [conf.username_key] = conf.username_value,
-        [conf.password_key] = conf.password_value
-      })
+      body = cjson.encode(payload)
     }
   )
 end

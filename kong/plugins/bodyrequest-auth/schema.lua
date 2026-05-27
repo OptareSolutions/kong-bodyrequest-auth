@@ -52,6 +52,18 @@ return {
             }
           },
           {
+            paramlogin_key = {
+              required = false,
+              type = "string"
+            }
+          },
+          {
+            paramlogin_value = {
+              required = false,
+              type = "string"
+            }
+          },
+          {
             json_token_key = {
               default = "token",
               type = "string"
