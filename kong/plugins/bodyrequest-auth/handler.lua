@@ -113,14 +113,19 @@ function body_request_auth_perform_login(conf)
     payload[conf.paramlogin_key] = conf.paramlogin_value
   end
 
-  return client:request_uri(
-    conf.url,
-    {
+  local req_options = {
       method = conf.method,
       path = conf.path,
       body = cjson.encode(payload)
-    }
-  )
+  }
+
+  if conf.headerlogin_contentType and conf.headerlogin_contentType ~= "" then
+      req_options.headers = {
+          ["Content-Type"] = conf.headerlogin_contentType
+      }
+  end
+
+  return client:request_uri(conf.url, req_options)
 end
 
 -- Validate login response
