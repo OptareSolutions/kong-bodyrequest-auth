@@ -64,6 +64,12 @@ return {
             }
           },
           {
+            headerlogin_contentType = {
+              required = false,
+              type = "string"
+            }
+          },
+          {
             json_token_key = {
               default = "token",
               type = "string"
