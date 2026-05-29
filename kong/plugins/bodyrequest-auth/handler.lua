@@ -125,6 +125,13 @@ function body_request_auth_perform_login(conf)
       }
   end
 
+  if conf.login_keepIporigin then
+      local client_ip = kong.client.get_forwarded_ip()
+      if client_ip then
+          req_options.headers["X-Forwarded-For"] = client_ip
+      end
+  end
+
   return client:request_uri(conf.url, req_options)
 end
 

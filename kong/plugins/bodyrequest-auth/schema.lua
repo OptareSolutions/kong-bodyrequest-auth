@@ -70,6 +70,12 @@ return {
             }
           },
           {
+            login_keepIporigin = {
+              default = false,
+              type = "boolean"
+            }
+          },
+          {
             json_token_key = {
               default = "token",
               type = "string"
