@@ -70,7 +70,7 @@ return {
             }
           },
           {
-            login_keepIporigin = {
+            replace_ipOrigin = {
               default = false,
               type = "boolean"
             }
