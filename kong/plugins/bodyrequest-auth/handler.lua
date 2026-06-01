@@ -45,6 +45,14 @@ function BodyRequestAuthHandler:access(conf)
   kong.log.debug("Token: " .. cjson.encode(tokenInfo))
 
   kong.service.request.set_header(conf.header_request, "Bearer " .. tokenInfo.token)
+
+  if conf.replace_ipOrigin then
+    local kong_ip = ngx.var.server_addr
+    kong.log.info("kong_ip: ", kong_ip)
+    if kong_ip then
+      kong.service.request.set_header("X-Forwarded-For", kong_ip)
+    end
+  end
 end
 
 
@@ -123,14 +131,6 @@ function body_request_auth_perform_login(conf)
       req_options.headers = {
           ["Content-Type"] = conf.headerlogin_contentType
       }
-  end
-
-  if conf.login_keepIporigin then
-      local client_ip = kong.client.get_forwarded_ip()
-      kong.log.info("client_ip: ", client_ip)
-      if client_ip then
-          req_options.headers["X-Forwarded-For"] = client_ip
-      end
   end
 
   return client:request_uri(conf.url, req_options)
