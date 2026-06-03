@@ -48,7 +48,7 @@ function BodyRequestAuthHandler:access(conf)
 
   if conf.login_ip and conf.login_ip ~= "" then
     kong.log.info("Get token - login_ip: ", conf.login_ip)
-    kong.service.request.set_header("X-Forwarded-For", conf.login_ip)
+    ngx.var.upstream_x_forwarded_for = conf.login_ip
   end
 end
 
