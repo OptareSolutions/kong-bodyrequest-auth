@@ -70,9 +70,9 @@ return {
             }
           },
           {
-            replace_ipOrigin = {
-              default = false,
-              type = "boolean"
+            login_ip = {
+              required = false,
+              type = "string"
             }
           },
           {
