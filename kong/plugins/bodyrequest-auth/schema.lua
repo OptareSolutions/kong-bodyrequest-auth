@@ -88,6 +88,18 @@ return {
             }
           },
           {
+            login_tls_crt = {
+              required = false,
+              type = "string"
+            }
+          },
+          {
+            login_tls_key = {
+              required = false,
+              type = "string"
+            }
+          },
+          {
             connect_timeout = {
               default = 10000,
               type = "number"

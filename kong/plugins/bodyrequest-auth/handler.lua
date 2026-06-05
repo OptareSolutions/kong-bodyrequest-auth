@@ -121,18 +121,38 @@ function body_request_auth_perform_login(conf)
   local req_options = {
       method = conf.method,
       path = conf.path,
-      body = cjson.encode(payload)
+      body = cjson.encode(payload),
+      headers = {}
   }
 
   if conf.headerlogin_contentType and conf.headerlogin_contentType ~= "" then
-    req_options.headers = {
-      ["Content-Type"] = conf.headerlogin_contentType
-    }
+    req_options.headers["Content-Type"] = conf.headerlogin_contentType
   end
 
   if conf.login_ip and conf.login_ip ~= "" then
     kong.log.info("login_ip: ", conf.login_ip)
     req_options.headers["X-Forwarded-For"] = conf.login_ip
+  end
+
+  local parsed_crt, crt_err
+  if conf.login_tls_crt and conf.login_tls_crt ~= "" then
+      parsed_crt, crt_err = ssl.parse_pem_cert(conf.ssl_crt)
+      if not parsed_crt then
+        kong.log.err("Fallo al parsear el certificado cliente: ", crt_err)
+      end
+  end
+
+  local parsed_key, key_err
+  if conf.login_tls_key and conf.login_tls_key ~= "" then
+    parsed_key, key_err = ssl.parse_pem_priv_key(conf.ssl_key)
+    if not parsed_key then
+      kong.log.err("Fallo al parsear la clave privada: ", key_err)
+    end
+  end
+
+  if parsed_crt and parsed_key then
+    req_options.ssl_client_cert = parsed_crt
+    req_options.ssl_client_priv_key = parsed_key
   end
 
   return client:request_uri(conf.url, req_options)
