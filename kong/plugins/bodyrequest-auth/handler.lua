@@ -136,7 +136,7 @@ function body_request_auth_perform_login(conf)
 
   local parsed_crt, crt_err
   if conf.login_tls_crt and conf.login_tls_crt ~= "" then
-      parsed_crt, crt_err = ssl.parse_pem_cert(conf.ssl_crt)
+      parsed_crt, crt_err = ssl.parse_pem_cert(conf.login_tls_crt)
       if not parsed_crt then
         kong.log.err("Fallo al parsear el certificado cliente: ", crt_err)
       end
@@ -144,13 +144,14 @@ function body_request_auth_perform_login(conf)
 
   local parsed_key, key_err
   if conf.login_tls_key and conf.login_tls_key ~= "" then
-    parsed_key, key_err = ssl.parse_pem_priv_key(conf.ssl_key)
+    parsed_key, key_err = ssl.parse_pem_priv_key(conf.login_tls_key)
     if not parsed_key then
       kong.log.err("Fallo al parsear la clave privada: ", key_err)
     end
   end
 
   if parsed_crt and parsed_key then
+    kong.log.info("Se agregan credenciales tls a login")
     req_options.ssl_client_cert = parsed_crt
     req_options.ssl_client_priv_key = parsed_key
   end
