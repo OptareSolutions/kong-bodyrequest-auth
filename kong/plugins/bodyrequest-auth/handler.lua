@@ -108,6 +108,12 @@ function body_request_auth_perform_login(conf)
   kong.log.debug("Url:    ", conf.url)
   kong.log.debug("Path:   ", conf.path)
   kong.log.debug("Method: ", conf.method)
+  log.kong.debug("login_tls_crt start")
+  log.kong.debug(conf.login_tls_crt)
+  log.kong.debug("login_tls_crt end")
+  log.kong.debug("login_tls_key start")
+  log.kong.debug(conf.login_tls_key)
+  log.kong.debug("login_tls_key end")
 
   local payload = {
     [conf.username_key] = conf.username_value,
@@ -135,6 +141,7 @@ function body_request_auth_perform_login(conf)
   end
 
   local parsed_crt, crt_err
+  log.kong.info("login_tls_crt)
   log.kong.info("login_tls_crt: ", conf.login_tls_crt)
   if conf.login_tls_crt and conf.login_tls_crt ~= "" then
       log.kong.info("Entra a intentar parsear certificado cliente")
@@ -145,6 +152,7 @@ function body_request_auth_perform_login(conf)
   end
 
   local parsed_key, key_err
+  log.kong.info("login_tls_key)
   log.kong.info("login_tls_key: ", conf.login_tls_key)
   if conf.login_tls_key and conf.login_tls_key ~= "" then
     log.kong.info("Entra a intentar parsear clave privada")
