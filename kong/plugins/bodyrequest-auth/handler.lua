@@ -141,7 +141,7 @@ function body_request_auth_perform_login(conf)
   end
 
   local parsed_crt, crt_err
-  log.kong.info("login_tls_crt)
+  log.kong.info("login_tls_crt")
   log.kong.info("login_tls_crt: ", conf.login_tls_crt)
   if conf.login_tls_crt and conf.login_tls_crt ~= "" then
       log.kong.info("Entra a intentar parsear certificado cliente")
@@ -152,7 +152,7 @@ function body_request_auth_perform_login(conf)
   end
 
   local parsed_key, key_err
-  log.kong.info("login_tls_key)
+  log.kong.info("login_tls_key")
   log.kong.info("login_tls_key: ", conf.login_tls_key)
   if conf.login_tls_key and conf.login_tls_key ~= "" then
     log.kong.info("Entra a intentar parsear clave privada")
