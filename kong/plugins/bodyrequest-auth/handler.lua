@@ -108,12 +108,12 @@ function body_request_auth_perform_login(conf)
   kong.log.debug("Url:    ", conf.url)
   kong.log.debug("Path:   ", conf.path)
   kong.log.debug("Method: ", conf.method)
-  log.kong.debug("login_tls_crt start")
-  log.kong.debug(conf.login_tls_crt)
-  log.kong.debug("login_tls_crt end")
-  log.kong.debug("login_tls_key start")
-  log.kong.debug(conf.login_tls_key)
-  log.kong.debug("login_tls_key end")
+  kong.log.debug("login_tls_crt start")
+  kong.log.debug(conf.login_tls_crt)
+  kong.log.debug("login_tls_crt end")
+  kong.log.debug("login_tls_key start")
+  kong.log.debug(conf.login_tls_key)
+  kong.log.debug("login_tls_key end")
 
   local payload = {
     [conf.username_key] = conf.username_value,
@@ -141,10 +141,10 @@ function body_request_auth_perform_login(conf)
   end
 
   local parsed_crt, crt_err
-  log.kong.info("login_tls_crt")
-  log.kong.info("login_tls_crt: ", conf.login_tls_crt)
+  kong.log.info("login_tls_crt")
+  kong.log.info("login_tls_crt: ", conf.login_tls_crt)
   if conf.login_tls_crt and conf.login_tls_crt ~= "" then
-      log.kong.info("Entra a intentar parsear certificado cliente")
+      kong.log.info("Entra a intentar parsear certificado cliente")
       parsed_crt, crt_err = ssl.parse_pem_cert(conf.login_tls_crt)
       if not parsed_crt then
         kong.log.err("Fallo al parsear el certificado cliente: ", crt_err)
@@ -152,10 +152,10 @@ function body_request_auth_perform_login(conf)
   end
 
   local parsed_key, key_err
-  log.kong.info("login_tls_key")
-  log.kong.info("login_tls_key: ", conf.login_tls_key)
+  kong.log.info("login_tls_key")
+  kong.log.info("login_tls_key: ", conf.login_tls_key)
   if conf.login_tls_key and conf.login_tls_key ~= "" then
-    log.kong.info("Entra a intentar parsear clave privada")
+    kong.log.info("Entra a intentar parsear clave privada")
     parsed_key, key_err = ssl.parse_pem_priv_key(conf.login_tls_key)
     if not parsed_key then
       kong.log.err("Fallo al parsear la clave privada: ", key_err)
