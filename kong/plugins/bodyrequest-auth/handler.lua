@@ -1,5 +1,6 @@
 local http = require "resty.http"
 local cjson = require "cjson"
+local ssl = require "ngx.ssl"
 local kong = kong
 local BodyRequestAuthHandler = {
   VERSION = "2.0.1"
