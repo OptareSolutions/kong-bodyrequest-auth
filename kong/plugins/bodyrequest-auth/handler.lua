@@ -144,7 +144,7 @@ function body_request_auth_perform_login(conf)
   end
 
   if parsed_crt and parsed_key then
-    kong.log.info("Se agregan credenciales tls a login")
+    kong.log.debug("Se agregan credenciales tls a login")
     req_options.ssl_client_cert = parsed_crt
     req_options.ssl_client_priv_key = parsed_key
   end
