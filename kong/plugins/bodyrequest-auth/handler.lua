@@ -47,10 +47,6 @@ function BodyRequestAuthHandler:access(conf)
 
   kong.service.request.set_header(conf.header_request, "Bearer " .. tokenInfo.token)
 
-  if conf.login_ip and conf.login_ip ~= "" then
-    kong.log.info("Get token - login_ip: ", conf.login_ip)
-    ngx.var.upstream_x_forwarded_for = conf.login_ip
-  end
 end
 
 
@@ -131,14 +127,8 @@ function body_request_auth_perform_login(conf)
     req_options.headers["Content-Type"] = conf.headerlogin_contentType
   end
 
-  if conf.login_ip and conf.login_ip ~= "" then
-    kong.log.info("login_ip: ", conf.login_ip)
-    req_options.headers["X-Forwarded-For"] = conf.login_ip
-  end
-
   local parsed_crt, crt_err
   if conf.login_tls_crt and conf.login_tls_crt ~= "" then
-      kong.log.info("Entra a intentar parsear certificado cliente")
       parsed_crt, crt_err = ssl.parse_pem_cert(conf.login_tls_crt)
       if not parsed_crt then
         kong.log.err("Fallo al parsear el certificado cliente: ", crt_err)
@@ -147,7 +137,6 @@ function body_request_auth_perform_login(conf)
 
   local parsed_key, key_err
   if conf.login_tls_key and conf.login_tls_key ~= "" then
-    kong.log.info("Entra a intentar parsear clave privada")
     parsed_key, key_err = ssl.parse_pem_priv_key(conf.login_tls_key)
     if not parsed_key then
       kong.log.err("Fallo al parsear la clave privada: ", key_err)
@@ -155,7 +144,7 @@ function body_request_auth_perform_login(conf)
   end
 
   if parsed_crt and parsed_key then
-    kong.log.info("Se agregan credenciales tls a login")
+    kong.log.debug("Se agregan credenciales tls a login")
     req_options.ssl_client_cert = parsed_crt
     req_options.ssl_client_priv_key = parsed_key
   end
