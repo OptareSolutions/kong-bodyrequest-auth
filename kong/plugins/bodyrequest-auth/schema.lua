@@ -70,12 +70,6 @@ return {
             }
           },
           {
-            login_ip = {
-              required = false,
-              type = "string"
-            }
-          },
-          {
             json_token_key = {
               default = "token",
               type = "string"
