@@ -73,6 +73,7 @@ return {
             replace_ipOrigin = {
               default = false,
               type = "boolean"
+            }
           },
           {
             json_token_key = {
