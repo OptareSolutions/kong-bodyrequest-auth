@@ -47,6 +47,14 @@ function BodyRequestAuthHandler:access(conf)
 
   kong.service.request.set_header(conf.header_request, "Bearer " .. tokenInfo.token)
 
+  if conf.replace_ipOrigin then
+    local kong_ip = ngx.var.server_addr
+    kong.log.info("kong_ip: ", kong_ip)
+    if kong_ip then
+      kong.service.request.set_header("X-Forwarded-For", kong_ip)
+    end
+  end
+
 end
 
 
