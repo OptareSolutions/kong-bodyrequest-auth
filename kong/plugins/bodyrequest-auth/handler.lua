@@ -98,6 +98,7 @@ function body_request_auth_get_token(conf)
     return nil;
   end
 
+  kong.log.notice("Get token from login (" + conf.url + conf.path + ")")
   return body_request_auth_get_token_from_response(res, conf)
 end
 
