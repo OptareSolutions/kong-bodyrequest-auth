@@ -95,11 +95,11 @@ function body_request_auth_get_token(conf)
 
   local error_message = body_request_auth_validate_login(res, err, conf)
   if error_message then
-    kong.log.error("Get token from login error (" + conf.url + conf.path + "): " + error_message)
+    kong.log.error("Get token from login error (" .. conf.url .. conf.path .. "): " .. error_message)
     return nil;
   end
 
-  kong.log.notice("Get token from login (" + conf.url + conf.path + ")")
+  kong.log.notice("Get token from login (" .. conf.url .. conf.path .. ")")
   return body_request_auth_get_token_from_response(res, conf)
 end
 
